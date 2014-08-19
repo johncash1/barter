@@ -2,6 +2,7 @@ package com.xware.barter.action;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +44,19 @@ public class ItemServiceImpl implements ItemService{
 	@Override
 	public Item add(Item item) {
 		
+		try {
 		 sessionFactory.getCurrentSession().saveOrUpdate(item);
 		 Integer id =item.getId(); 
 		 if (id != null)
 		    return item;
-		 else 
-			 return null;
-		
+		 
+
+		}
+		catch(HibernateException he){
+			
+			System.out.println( "HIBERNATE ERROR!!! "+  he.getMessage());
+		}
+		return null;
 	}
 
 	@Override

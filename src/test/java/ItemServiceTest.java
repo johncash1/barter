@@ -1,5 +1,11 @@
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -25,12 +31,42 @@ public class ItemServiceTest {
 	private ContactService contactService;
 	@Autowired
 	private UserService userService;
+	
+	  @Autowired
+	  private SessionFactory sessionFactory;
+	  
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+
+		
 	}
 
 	@Before
 	public void setUp() throws Exception {
+		
+		try {
+		Session s=	sessionFactory.openSession();
+	Query q=s.createSQLQuery("delete from item");
+	
+	q.executeUpdate();
+	q=s.createSQLQuery("delete from user");
+	q.executeUpdate();
+	q=s.createSQLQuery("delete from contact");
+	q.executeUpdate();
+	s.close();
+		}
+		catch(HibernateException he){
+			System.out.println("intialization fucked up hibernate error !" +he.getMessage());
+			
+			
+		}
+		catch(Exception e){
+			System.out.println("intialization fucked up !" +e.getMessage());
+			
+			
+		}
+		
+		
 		User user = new User();
 		user.setUname("uname 1");
 		
@@ -83,6 +119,16 @@ public class ItemServiceTest {
 	public void testAdd() {
 		itemService.add(item);
 		assertTrue(item.getId()!=null) ;
+		item.setUser(null);
+		Item item2 = new Item();
+	//	item2 = new Item();
+		item2.setType("type");
+		User user = new User();
+		user.setUname("uname 2");
+		item2.setUser(null);
+		item2.setValue(" Item 2 value");
+		itemService.add(item2);
+		assertTrue(item2.getId()==null) ;
 	}
 
 	@Test
